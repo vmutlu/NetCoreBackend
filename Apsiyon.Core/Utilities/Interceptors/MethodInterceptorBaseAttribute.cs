@@ -1,4 +1,4 @@
-﻿using Castle.Core.Interceptor;
+﻿using Castle.DynamicProxy;
 using System;
 
 namespace Apsiyon.Core.Utilities.Interceptors
