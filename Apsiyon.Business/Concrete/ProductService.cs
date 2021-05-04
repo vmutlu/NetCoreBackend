@@ -1,5 +1,7 @@
 ﻿using Apsiyon.Business.Abstract;
 using Apsiyon.Business.Constants;
+using Apsiyon.Business.ValidationRules.FluentValidation;
+using Apsiyon.Core.Aspects.Autofac.Validation;
 using Apsiyon.Core.Utilities.Results;
 using Apsiyon.DataAccess.Abstract;
 using Apsiyon.Entities.Concrete;
@@ -15,7 +17,7 @@ namespace Apsiyon.Business.Concrete
             _productRepository = productRepository;
         }
 
-        //[ProductValidator()]
+        [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
             _productRepository.Add(product);
