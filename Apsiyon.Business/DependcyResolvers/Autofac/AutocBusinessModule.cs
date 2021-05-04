@@ -1,9 +1,12 @@
 ﻿using Apsiyon.Business.Abstract;
 using Apsiyon.Business.Concrete;
+using Apsiyon.Core.Utilities.Interceptors;
 using Apsiyon.Core.Utilities.Security.Jwt;
 using Apsiyon.DataAccess.Abstract;
 using Apsiyon.DataAccess.Concrete.EntityFramework;
 using Autofac;
+using Autofac.Extras.DynamicProxy;
+using Castle.DynamicProxy;
 
 namespace Apsiyon.Business.DependcyResolvers.Autofac
 {
@@ -22,6 +25,13 @@ namespace Apsiyon.Business.DependcyResolvers.Autofac
 
             builder.RegisterType<AuthService>().As<IAuthService>();
             builder.RegisterType<JwtHelper>().As<ITokenHelper>();
+
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            builder.RegisterAssemblyTypes(assembly).AsImplementedInterfaces()
+                 .EnableInterfaceInterceptors(new ProxyGenerationOptions()
+                 {
+                     Selector = new AspectInterceptorSelector()
+                 }).SingleInstance();
         }
     }
 }
