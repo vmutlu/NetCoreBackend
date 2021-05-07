@@ -1,3 +1,6 @@
+using Apsiyon.Core.DependencyResolvers;
+using Apsiyon.Core.Extensions;
+using Apsiyon.Core.Utilities.IoC;
 using Apsiyon.Core.Utilities.Security.Encryption;
 using Apsiyon.Core.Utilities.Security.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,7 +33,8 @@ namespace Apsiyon.API
 
             var tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateAudience = true,
@@ -41,6 +45,10 @@ namespace Apsiyon.API
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
                 };
+            });
+
+            services.AddDependencyResolvers(new ICoreModule[]{
+                 new CoreModule()
             });
 
             services.AddSwaggerGen(c =>
