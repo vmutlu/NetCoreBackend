@@ -1,4 +1,4 @@
-﻿using Apsiyon.Entities.Abstract;
+﻿using Apsiyon.Core.Entities.Abstract;
 
 namespace Apsiyon.Entities.Concrete
 {

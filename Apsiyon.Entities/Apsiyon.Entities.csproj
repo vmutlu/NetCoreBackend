@@ -4,4 +4,8 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Apsiyon.Core\Apsiyon.Core.csproj" />
+  </ItemGroup>
+
 </Project>
