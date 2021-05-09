@@ -1,8 +1,13 @@
 ﻿using Apsiyon.Business.Abstract;
 using Apsiyon.Business.Constants;
 using Apsiyon.Business.ValidationRules.FluentValidation;
+using Apsiyon.Core.Aspects.Autofac.Caching;
+using Apsiyon.Core.Aspects.Autofac.Logging;
+using Apsiyon.Core.Aspects.Autofac.Performans;
 using Apsiyon.Core.Aspects.Autofac.Transaction;
+using Apsiyon.Core.Aspects.Autofac.UsersAspect;
 using Apsiyon.Core.Aspects.Autofac.Validation;
+using Apsiyon.Core.CrossCuttingConcerns.Logging.Log4Net.Loggers;
 using Apsiyon.Core.Utilities.Results;
 using Apsiyon.DataAccess.Abstract;
 using Apsiyon.Entities.Concrete;
@@ -18,8 +23,10 @@ namespace Apsiyon.Business.Concrete
             _productRepository = productRepository;
         }
 
+        [SecuredOperation("admin,user")]
         [ValidationAspect(typeof(ProductValidator))]
         [TransactionScopeAspect]
+        [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
         {
             _productRepository.Add(product);
@@ -32,11 +39,14 @@ namespace Apsiyon.Business.Concrete
             return new SuccessResult(Messages.ProductDeleted);
         }
 
+        [LogAspect(typeof(FileLogger))]
         public IDataResult<Product> GetById(int productId)
         {
             return new SuccessDataResult<Product>(_productRepository.Get(p => p.Id == productId));
         }
 
+        [PerformanceAspect(5)]
+        [CacheAspect(1)]
         public IDataResult<List<Product>> GetList()
         {
             return new SuccessDataResult<List<Product>>(_productRepository.GetList());

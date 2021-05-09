@@ -3,15 +3,17 @@ using System;
 using Apsiyon.DataAccess.Concrete.EntityFramework.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Apsiyon.DataAccess.Migrations
 {
     [DbContext(typeof(ApsiyonContext))]
-    partial class ApsiyonContextModelSnapshot : ModelSnapshot
+    [Migration("20210509122931_log_table_added")]
+    partial class log_table_added
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
