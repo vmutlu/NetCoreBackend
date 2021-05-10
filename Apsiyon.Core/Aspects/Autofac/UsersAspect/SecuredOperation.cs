@@ -27,7 +27,7 @@ namespace Apsiyon.Core.Aspects.Autofac.UsersAspect
                 if (roleClaims.Contains(role))
                     return;
 
-            throw new Exception(AuthMessages.AuthorizationDenied);
+            throw new System.Exception(AuthMessages.AuthorizationDenied);
         }
     }
 }

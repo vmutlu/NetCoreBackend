@@ -1,25 +1,26 @@
 ﻿using Castle.DynamicProxy;
+using System;
 
 namespace Apsiyon.Core.Utilities.Interceptors
 {
     public abstract class MethodInterception : MethodInterceptorBaseAttribute
     {
-        protected virtual void OnBefore(IInvocation ınvocation)
+        protected virtual void OnBefore(IInvocation invocation)
         {
 
         }
 
-        protected virtual void OnAfter(IInvocation ınvocation)
+        protected virtual void OnAfter(IInvocation invocation)
         {
 
         }
 
-        protected virtual void OnException(IInvocation ınvocation)
+        protected virtual void OnException(IInvocation invocation, Exception e)
         {
 
         }
 
-        protected virtual void OnSuccess(IInvocation ınvocation)
+        protected virtual void OnSuccess(IInvocation invocation)
         {
 
         }
@@ -33,10 +34,10 @@ namespace Apsiyon.Core.Utilities.Interceptors
             {
                 invocation.Proceed();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 isSuccess = false;
-                OnException(invocation);
+                OnException(invocation, e);
                 throw;
             }
 

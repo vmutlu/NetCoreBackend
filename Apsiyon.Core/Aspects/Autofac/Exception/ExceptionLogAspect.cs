@@ -6,27 +6,31 @@ using Castle.DynamicProxy;
 using System;
 using System.Collections.Generic;
 
-namespace Apsiyon.Core.Aspects.Autofac.Logging
+namespace Apsiyon.Core.Aspects.Autofac.Exception
 {
-    public class LogAspect : MethodInterception
+    public class ExceptionLogAspect : MethodInterception
     {
         private LoggerServiceBase _loggerServiceBase;
-        public LogAspect(Type loggerService)
+        public ExceptionLogAspect(Type loggerServiceBase)
         {
-            if (loggerService.BaseType != typeof(LoggerServiceBase))
+            if (loggerServiceBase.BaseType != typeof(LoggerServiceBase))
                 throw new System.Exception(AspectMessages.WrongLoggerType);
 
-            _loggerServiceBase = (LoggerServiceBase)Activator.CreateInstance(loggerService);
+            _loggerServiceBase = (LoggerServiceBase)Activator.CreateInstance(loggerServiceBase);
         }
 
-        protected override void OnBefore(IInvocation invocation) =>  _loggerServiceBase.Info(GetLogDetail(invocation));
-        protected override void OnAfter(IInvocation invocation) =>  _loggerServiceBase.Info(GetLogDetail(invocation));
-        protected override void OnException(IInvocation invocation, System.Exception e) =>  _loggerServiceBase.Error(GetLogDetail(invocation));
-        protected override void OnSuccess(IInvocation invocation) =>  _loggerServiceBase.Info(GetLogDetail(invocation));
+        protected override void OnException(IInvocation invocation, System.Exception e)
+        {
+            LogDetailWithException logDetailWithException = GetLogDetail(invocation);
+            logDetailWithException.ExceptionMessage = e.Message;
 
-        private LogDetail GetLogDetail(IInvocation invocation)
+            _loggerServiceBase.Error(logDetailWithException);
+        }
+
+        private LogDetailWithException GetLogDetail(IInvocation invocation)
         {
             List<LogParameter> logParameters = new();
+
             for (int i = 0; i < invocation.Arguments.Length; i++)
             {
                 logParameters.Add(new LogParameter
@@ -35,15 +39,16 @@ namespace Apsiyon.Core.Aspects.Autofac.Logging
                     Value = invocation.Arguments[i],
                     Type = invocation.Arguments[i].GetType().Name
                 });
-            }          
+            }
 
-            LogDetail logDetail = new()
+            var logDetailWithException = new LogDetailWithException
             {
                 MethodName = invocation.Method.Name,
                 LogParameters = logParameters
             };
 
-            return logDetail;
+            return logDetailWithException;
         }
+
     }
 }
