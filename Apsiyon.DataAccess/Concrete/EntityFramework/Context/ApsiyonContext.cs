@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Apsiyon.Core.Entities.Concrete;
 using System.IO;
 using Apsiyon.Entities.Concrete;
+using Apsiyon.DataAccess.Concrete.EntityFramework.Configurations;
 
 namespace Apsiyon.DataAccess.Concrete.EntityFramework.Context
 {
@@ -21,5 +22,10 @@ namespace Apsiyon.DataAccess.Concrete.EntityFramework.Context
         public DbSet<UserOperationClaim> UserOperationClaims { get; set; }
         public DbSet<OperationClaim> OperationClaims { get; set; }
         public DbSet<Logs> Logs { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration<User>(new UserConfiguration());
+        }
     }
 }

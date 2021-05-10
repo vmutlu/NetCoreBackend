@@ -8,6 +8,7 @@ using Apsiyon.Core.Aspects.Autofac.Transaction;
 using Apsiyon.Core.Aspects.Autofac.UsersAspect;
 using Apsiyon.Core.Aspects.Autofac.Validation;
 using Apsiyon.Core.CrossCuttingConcerns.Logging.Log4Net.Loggers;
+using Apsiyon.Core.Utilities.Business;
 using Apsiyon.Core.Utilities.Results;
 using Apsiyon.DataAccess.Abstract;
 using Apsiyon.Entities.Concrete;
@@ -18,9 +19,19 @@ namespace Apsiyon.Business.Concrete
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
-        public ProductService(IProductRepository productRepository)
+        private readonly ICategoryService _categoryService;
+        public ProductService(IProductRepository productRepository, ICategoryService categoryService)
         {
             _productRepository = productRepository;
+            _categoryService = categoryService;
+        }
+
+        private IResult CheckIfProductNameExists(string productName)
+        {
+            if (_productRepository.Get(p => p.ProductName == productName) != null)
+                return new ErrorResult(Messages.ErrorProductAdded);
+
+            return new SuccessResult();
         }
 
         [SecuredOperation("admin,user")]
@@ -29,6 +40,10 @@ namespace Apsiyon.Business.Concrete
         [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
         {
+            IResult result = BusinessRules.Run(CheckIfProductNameExists(product.ProductName), CheckIfCategoryIsEnabled());
+            if (result == null)
+                return result;
+
             _productRepository.Add(product);
             return new SuccessResult(Messages.ProductAdded);
         }
@@ -39,7 +54,7 @@ namespace Apsiyon.Business.Concrete
             return new SuccessResult(Messages.ProductDeleted);
         }
 
-        [LogAspect(typeof(FileLogger))]
+        [LogAspect(typeof(DatabaseLogger))]
         public IDataResult<Product> GetById(int productId)
         {
             return new SuccessDataResult<Product>(_productRepository.Get(p => p.Id == productId));
@@ -55,6 +70,14 @@ namespace Apsiyon.Business.Concrete
         public IDataResult<List<Product>> GetListProductCategory(int categoryId)
         {
             return new SuccessDataResult<List<Product>>(_productRepository.GetList(p => p.CategoryId == categoryId));
+        }
+
+        private IResult CheckIfCategoryIsEnabled()
+        {
+            var result = _categoryService.GetList();
+            if (result.Data.Count < 10) return new ErrorResult(Messages.ErrorCategoryAdded);
+
+            return new SuccessResult();
         }
 
         public IResult Update(Product product)

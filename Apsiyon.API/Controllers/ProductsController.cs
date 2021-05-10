@@ -39,8 +39,8 @@ namespace Apsiyon.API.Controllers
                 return BadRequest(response);
         }
 
-        [HttpGet("getById/{id}")]
-        public IActionResult GetById(int id)
+        [HttpGet("getById")]
+        public IActionResult GetById([FromQuery] int id)
         {
             var response = _productService.GetById(id);
 

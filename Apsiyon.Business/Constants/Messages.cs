@@ -17,5 +17,8 @@
         public static string UserAlreadyExists = "Sitemde bu email adresine ait email bilgisi zaten var!";
         public static string UserRegistered = "Kullanıcı başarıyla sisteme kayıt edildi.";
         public static string AccessTokenCreated = "Token oluşturuldu";
+
+        public static string ErrorProductAdded = "Bu ürün adında ürün sistemde zaten mevcut";
+        public static string ErrorCategoryAdded = "Bu kategoride yeterince ürün var !";
     }
 }

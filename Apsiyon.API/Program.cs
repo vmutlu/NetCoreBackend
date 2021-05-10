@@ -3,6 +3,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Apsiyon.API
 {
@@ -19,6 +20,10 @@ namespace Apsiyon.API
             .ConfigureContainer<ContainerBuilder>(builder =>
             {
                 builder.RegisterModule(new AutocBusinessModule());
+            }).ConfigureLogging(builder =>
+            {
+                builder.SetMinimumLevel(LogLevel.Trace);
+                builder.AddLog4Net("log4net.config");
             })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

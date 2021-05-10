@@ -16,10 +16,7 @@ namespace Apsiyon.API
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        public Startup(IConfiguration configuration) => Configuration = configuration;
 
         public IConfiguration Configuration { get; }
 
@@ -65,6 +62,8 @@ namespace Apsiyon.API
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Apsiyon.API v1"));
             }
+
+            app.ConfigureCustomExceptionMiddleware();
 
             app.UseCors(builder => builder.WithOrigins("http://localhost:4200").AllowAnyHeader());
 
