@@ -31,18 +31,18 @@ namespace Apsiyon.Business.Concrete
             if (_productRepository.Get(p => p.ProductName == productName) != null)
                 return new ErrorResult(Messages.ErrorProductAdded);
 
-            return new SuccessResult();
+            return new SuccessResult("Ürün eklensin");
         }
 
-        [SecuredOperation("admin,user")]
-        [ValidationAspect(typeof(ProductValidator))]
+        //[SecuredOperation("admin,user")]
+        //[ValidationAspect(typeof(ProductValidator))]
         [TransactionScopeAspect]
         [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
         {
-            IResult result = BusinessRules.Run(CheckIfProductNameExists(product.ProductName), CheckIfCategoryIsEnabled());
-            if (result == null)
-                return result;
+            //IResult result = BusinessRules.Run(CheckIfProductNameExists(product.ProductName));
+            //if (result == null)
+            //    return result;
 
             _productRepository.Add(product);
             return new SuccessResult(Messages.ProductAdded);
@@ -70,14 +70,6 @@ namespace Apsiyon.Business.Concrete
         public IDataResult<List<Product>> GetListProductCategory(int categoryId)
         {
             return new SuccessDataResult<List<Product>>(_productRepository.GetList(p => p.CategoryId == categoryId));
-        }
-
-        private IResult CheckIfCategoryIsEnabled()
-        {
-            var result = _categoryService.GetList();
-            if (result.Data.Count < 10) return new ErrorResult(Messages.ErrorCategoryAdded);
-
-            return new SuccessResult();
         }
 
         public IResult Update(Product product)

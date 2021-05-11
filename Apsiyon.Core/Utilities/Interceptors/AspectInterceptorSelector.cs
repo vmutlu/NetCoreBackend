@@ -17,7 +17,7 @@ namespace Apsiyon.Core.Utilities.Interceptors
             var methodAttributes = type.GetMethod(method.Name)
                 .GetCustomAttributes<MethodInterceptorBaseAttribute>(true);
             classAttributes.AddRange(methodAttributes);
-            classAttributes.Add(new ExceptionLogAspect(typeof(FileLogger)));
+            classAttributes.Add(new ExceptionLogAspect(typeof(DatabaseLogger)));
 
             return classAttributes.OrderBy(x => x.Priority).ToArray();
         }
