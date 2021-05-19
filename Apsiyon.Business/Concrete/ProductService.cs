@@ -8,11 +8,13 @@ using Apsiyon.Core.Aspects.Autofac.Transaction;
 using Apsiyon.Core.Aspects.Autofac.UsersAspect;
 using Apsiyon.Core.Aspects.Autofac.Validation;
 using Apsiyon.Core.CrossCuttingConcerns.Logging.Log4Net.Loggers;
+using Apsiyon.Core.Extensions.MapHelper;
 using Apsiyon.Core.Utilities.Business;
 using Apsiyon.Core.Utilities.Results;
 using Apsiyon.DataAccess.Abstract;
 using Apsiyon.Entities.Concrete;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Apsiyon.Business.Concrete
 {
@@ -57,19 +59,60 @@ namespace Apsiyon.Business.Concrete
         [LogAspect(typeof(DatabaseLogger))]
         public IDataResult<Product> GetById(int productId)
         {
-            return new SuccessDataResult<Product>(_productRepository.Get(p => p.Id == productId));
+            var product = _productRepository.Get(p => p.Id == productId, t => t.CategoryWithProducts);
+            if (product is null)
+                return new ErrorDataResult<Product>(productId + Messages.NotFoundProduct);
+
+            Product response = new()
+            {
+                Id = product.Id,
+                ProductName = product.ProductName,
+                QuantityPerUnit = product.QuantityPerUnit,
+                UnitPrice = product.UnitPrice,
+                UnitsInStock = product.UnitsInStock,
+                CategoryWithProducts = product.CategoryWithProducts != null ? from pc in product.CategoryWithProducts
+                                                                              select new CategoryWithProduct
+                                                                              {
+                                                                                  CategoryId = pc.CategoryId,
+                                                                                  Id = pc.Id,
+                                                                                  Category = new Category()
+                                                                                  {
+                                                                                      Id = pc.CategoryId
+                                                                                  }
+                                                                              } : null
+            };
+            return new SuccessDataResult<Product>(response);
         }
 
         [PerformanceAspect(5)]
         [CacheAspect(1)]
         public IDataResult<List<Product>> GetList()
         {
-            return new SuccessDataResult<List<Product>>(_productRepository.GetList());
+            var response = (from p in _productRepository.GetList(null, p => p.CategoryWithProducts)
+                            select new Product()
+                            {
+                                Id = p.Id,
+                                ProductName = p.ProductName,
+                                QuantityPerUnit = p.QuantityPerUnit,
+                                UnitPrice = p.UnitPrice,
+                                UnitsInStock = p.UnitsInStock,
+                                CategoryWithProducts = p.CategoryWithProducts != null ? from pc in p.CategoryWithProducts
+                                                                                        select new CategoryWithProduct
+                                                                                        {
+                                                                                            CategoryId = pc.CategoryId,
+                                                                                            Id = pc.Id,
+                                                                                            Category = new Category()
+                                                                                            {
+                                                                                                Id = pc.CategoryId
+                                                                                            }
+                                                                                        } : null
+                            });
+            return new SuccessDataResult<List<Product>>(response.ToList());
         }
 
         public IDataResult<List<Product>> GetListProductCategory(int categoryId)
         {
-            return new SuccessDataResult<List<Product>>(_productRepository.GetList(p => p.CategoryId == categoryId));
+            return new SuccessDataResult<List<Product>>(_productRepository.GetList(p => p.Id == categoryId));
         }
 
         public IResult Update(Product product)
