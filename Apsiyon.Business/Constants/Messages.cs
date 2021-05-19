@@ -20,5 +20,7 @@
 
         public static string ErrorProductAdded = "Bu ürün adında ürün sistemde zaten mevcut";
         public static string ErrorCategoryAdded = "Bu kategoride yeterince ürün var !";
+
+        public static string NotFoundProduct = " Id'ye sahip ürün bulunamadı !";
     }
 }
