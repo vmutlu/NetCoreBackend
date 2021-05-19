@@ -4,6 +4,7 @@ using Apsiyon.Core.Utilities.Results;
 using Apsiyon.DataAccess.Abstract;
 using Apsiyon.Entities.Concrete;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Apsiyon.Business.Concrete
 {
@@ -28,12 +29,47 @@ namespace Apsiyon.Business.Concrete
 
         public IDataResult<Category> GetById(int categoryId)
         {
-            return new SuccessDataResult<Category>(_categoryRepository.Get(c => c.Id == categoryId));
+            var category = _categoryRepository.Get(p => p.Id == categoryId, t => t.CategoryWithProducts);
+            if (category is null)
+                return new ErrorDataResult<Category>(categoryId + Messages.NotFoundCategory);
+
+            Category response = new()
+            {
+                Id = category.Id,
+                Name = category.Name,
+                CategoryWithProducts = category.CategoryWithProducts != null ? from pc in category.CategoryWithProducts
+                                                                               select new CategoryWithProduct
+                                                                               {
+                                                                                   ProductId = pc.ProductId,
+                                                                                   Id = pc.Id,
+                                                                                   Product = new Product()
+                                                                                   {
+                                                                                       Id = pc.ProductId
+                                                                                   }
+                                                                               } : null
+            };
+            return new SuccessDataResult<Category>(response);
         }
 
         public IDataResult<List<Category>> GetList()
         {
-            return new SuccessDataResult<List<Category>>(_categoryRepository.GetList());
+            var response = (from c in _categoryRepository.GetList(null, c => c.CategoryWithProducts)
+                            select new Category()
+                            {
+                                Id = c.Id,
+                                Name = c.Name,
+                                CategoryWithProducts = c.CategoryWithProducts != null ? from cp in c.CategoryWithProducts
+                                                                                        select new CategoryWithProduct
+                                                                                        {
+                                                                                            ProductId = cp.ProductId,
+                                                                                            Id = cp.Id,
+                                                                                            Product = new Product()
+                                                                                            {
+                                                                                                Id = cp.ProductId
+                                                                                            }
+                                                                                        } : null
+                            });
+            return new SuccessDataResult<List<Category>>(response.ToList());
         }
 
         public IResult Update(Category category)

@@ -22,5 +22,6 @@
         public static string ErrorCategoryAdded = "Bu kategoride yeterince ürün var !";
 
         public static string NotFoundProduct = " Id'ye sahip ürün bulunamadı !";
+        public static string NotFoundCategory = " Id'ye sahip kategori bulunamadı !";
     }
 }
