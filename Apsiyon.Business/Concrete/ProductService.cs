@@ -1,20 +1,16 @@
-﻿using Apsiyon.Business.Abstract;
+﻿using Apsiyon.Aspects.Autofac.Caching;
+using Apsiyon.Aspects.Autofac.Logging;
+using Apsiyon.Aspects.Autofac.Performans;
+using Apsiyon.Aspects.Autofac.Transaction;
+using Apsiyon.Business.Abstract;
 using Apsiyon.Business.Constants;
-using Apsiyon.Business.ValidationRules.FluentValidation;
-using Apsiyon.Core.Aspects.Autofac.Caching;
-using Apsiyon.Core.Aspects.Autofac.Logging;
-using Apsiyon.Core.Aspects.Autofac.Performans;
-using Apsiyon.Core.Aspects.Autofac.Transaction;
-using Apsiyon.Core.Aspects.Autofac.UsersAspect;
-using Apsiyon.Core.Aspects.Autofac.Validation;
-using Apsiyon.Core.CrossCuttingConcerns.Logging.Log4Net.Loggers;
-using Apsiyon.Core.Extensions.MapHelper;
-using Apsiyon.Core.Utilities.Business;
-using Apsiyon.Core.Utilities.Results;
+using Apsiyon.CrossCuttingConcerns.Logging.Log4Net.Loggers;
 using Apsiyon.DataAccess.Abstract;
 using Apsiyon.Entities.Concrete;
+using Apsiyon.Utilities.Results;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Apsiyon.Business.Concrete
 {
@@ -28,9 +24,9 @@ namespace Apsiyon.Business.Concrete
             _categoryService = categoryService;
         }
 
-        private IResult CheckIfProductNameExists(string productName)
+        private async Task<IResult> CheckIfProductNameExists(string productName)
         {
-            if (_productRepository.Get(p => p.ProductName == productName) != null)
+            if (await _productRepository.GetAsync(p => p.ProductName == productName) != null)
                 return new ErrorResult(Messages.ErrorProductAdded);
 
             return new SuccessResult("Ürün eklensin");
@@ -40,26 +36,26 @@ namespace Apsiyon.Business.Concrete
         //[ValidationAspect(typeof(ProductValidator))]
         [TransactionScopeAspect]
         [CacheRemoveAspect("IProductService.Get")]
-        public IResult Add(Product product)
+        public async Task<IResult> Add(Product product)
         {
             //IResult result = BusinessRules.Run(CheckIfProductNameExists(product.ProductName));
             //if (result == null)
             //    return result;
 
-            _productRepository.Add(product);
+          await  _productRepository.AddAsync(product);
             return new SuccessResult(Messages.ProductAdded);
         }
 
-        public IResult Delete(Product product)
+        public async Task<IResult> Delete(Product product)
         {
-            _productRepository.Delete(product);
+           await _productRepository.DeleteAsync(product);
             return new SuccessResult(Messages.ProductDeleted);
         }
 
         [LogAspect(typeof(DatabaseLogger))]
-        public IDataResult<Product> GetById(int productId)
+        public async Task<IDataResult<Product>> GetById(int productId)
         {
-            var product = _productRepository.Get(p => p.Id == productId, t => t.CategoryWithProducts);
+            var product = await _productRepository.GetAsync(p => p.Id == productId, t => t.CategoryWithProducts);
             if (product is null)
                 return new ErrorDataResult<Product>(productId + Messages.NotFoundProduct);
 
@@ -86,9 +82,9 @@ namespace Apsiyon.Business.Concrete
 
         [PerformanceAspect(5)]
         [CacheAspect(1)]
-        public IDataResult<List<Product>> GetList()
+        public async Task<IDataResult<List<Product>>> GetList()
         {
-            var response = (from p in _productRepository.GetList(null, p => p.CategoryWithProducts)
+            var response = (from p in await _productRepository.GetAllAsync(null, null, p => p.CategoryWithProducts)
                             select new Product()
                             {
                                 Id = p.Id,
@@ -110,14 +106,15 @@ namespace Apsiyon.Business.Concrete
             return new SuccessDataResult<List<Product>>(response.ToList());
         }
 
-        public IDataResult<List<Product>> GetListProductCategory(int categoryId)
+        public async Task<IDataResult<List<Product>>> GetListProductCategory(int categoryId)
         {
-            return new SuccessDataResult<List<Product>>(_productRepository.GetList(p => p.Id == categoryId));
+            var response = await _productRepository.GetAllAsync(p => p.Id == categoryId, null);
+            return new SuccessDataResult<List<Product>>(response.ToList());
         }
 
-        public IResult Update(Product product)
+        public async Task<IResult> Update(Product product)
         {
-            _productRepository.Update(product);
+            await _productRepository.UpdateAsync(product);
             return new SuccessResult(Messages.ProductUpdated);
         }
     }

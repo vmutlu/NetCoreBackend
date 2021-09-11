@@ -1,15 +1,16 @@
-﻿using Apsiyon.Core.Utilities.Results;
-using Apsiyon.Entities.Concrete;
+﻿using Apsiyon.Entities.Concrete;
+using Apsiyon.Utilities.Results;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Apsiyon.Business.Abstract
 {
     public interface ICategoryService
     {
-        IDataResult<Category> GetById(int categoryId);
-        IDataResult<List<Category>> GetList();
-        IResult Add(Category category);
-        IResult Update(Category category);
-        IResult Delete(Category category);
+        Task< IDataResult<Category>> GetById(int categoryId);
+        Task<IDataResult<List<Category>>> GetList();
+        Task<IResult> Add(Category category);
+        Task<IResult> Update(Category category);
+        Task<IResult> Delete(Category category);
     }
 }

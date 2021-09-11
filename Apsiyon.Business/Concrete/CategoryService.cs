@@ -1,10 +1,11 @@
 ﻿using Apsiyon.Business.Abstract;
 using Apsiyon.Business.Constants;
-using Apsiyon.Core.Utilities.Results;
 using Apsiyon.DataAccess.Abstract;
 using Apsiyon.Entities.Concrete;
+using Apsiyon.Utilities.Results;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Apsiyon.Business.Concrete
 {
@@ -15,21 +16,21 @@ namespace Apsiyon.Business.Concrete
         {
             _categoryRepository = categoryRepository;
         }
-        public IResult Add(Category category)
+        public async Task<IResult> Add(Category category)
         {
-            _categoryRepository.Add(category);
+            await _categoryRepository.AddAsync(category);
             return new SuccessResult(Messages.CategoryAdded);
         }
 
-        public IResult Delete(Category category)
+        public async Task<IResult> Delete(Category category)
         {
-            _categoryRepository.Delete(category);
+            await _categoryRepository.DeleteAsync(category);
             return new SuccessResult(Messages.CategoryDeleted);
         }
 
-        public IDataResult<Category> GetById(int categoryId)
+        public async Task<IDataResult<Category>> GetById(int categoryId)
         {
-            var category = _categoryRepository.Get(p => p.Id == categoryId, t => t.CategoryWithProducts);
+            var category = await _categoryRepository.GetAsync(p => p.Id == categoryId, t => t.CategoryWithProducts);
             if (category is null)
                 return new ErrorDataResult<Category>(categoryId + Messages.NotFoundCategory);
 
@@ -51,9 +52,9 @@ namespace Apsiyon.Business.Concrete
             return new SuccessDataResult<Category>(response);
         }
 
-        public IDataResult<List<Category>> GetList()
+        public async Task<IDataResult<List<Category>>> GetList()
         {
-            var response = (from c in _categoryRepository.GetList(null, c => c.CategoryWithProducts)
+            var response = (from c in await _categoryRepository.GetAllAsync(null,null, c => c.CategoryWithProducts)
                             select new Category()
                             {
                                 Id = c.Id,
@@ -72,9 +73,9 @@ namespace Apsiyon.Business.Concrete
             return new SuccessDataResult<List<Category>>(response.ToList());
         }
 
-        public IResult Update(Category category)
+        public async Task<IResult> Update(Category category)
         {
-            _categoryRepository.Update(category);
+            await _categoryRepository.UpdateAsync(category);
             return new SuccessResult(Messages.CategoryUpdated);
         }
     }

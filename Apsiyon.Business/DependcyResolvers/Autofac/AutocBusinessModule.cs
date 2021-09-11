@@ -1,9 +1,9 @@
 ﻿using Apsiyon.Business.Abstract;
 using Apsiyon.Business.Concrete;
-using Apsiyon.Core.Utilities.Interceptors;
-using Apsiyon.Core.Utilities.Security.Jwt;
 using Apsiyon.DataAccess.Abstract;
 using Apsiyon.DataAccess.Concrete.EntityFramework;
+using Apsiyon.Utilities.Interceptors;
+using Apsiyon.Utilities.Security.Jwt;
 using Autofac;
 using Autofac.Extras.DynamicProxy;
 using Castle.DynamicProxy;

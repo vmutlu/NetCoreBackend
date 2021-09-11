@@ -1,16 +1,17 @@
-﻿using Apsiyon.Core.Utilities.Results;
-using Apsiyon.Entities.Concrete;
+﻿using Apsiyon.Entities.Concrete;
+using Apsiyon.Utilities.Results;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Apsiyon.Business.Abstract
 {
     public interface IProductService
     {
-        IDataResult<Product> GetById(int productId);
-        IDataResult<List<Product>> GetList();
-        IDataResult<List<Product>> GetListProductCategory(int categoryId);
-        IResult Add(Product product);
-        IResult Update(Product product);
-        IResult Delete(Product product);
+        Task<IDataResult<Product>> GetById(int productId);
+        Task<IDataResult<List<Product>>> GetList();
+        Task<IDataResult<List<Product>>> GetListProductCategory(int categoryId);
+        Task<IResult> Add(Product product);
+        Task<IResult> Update(Product product);
+        Task<IResult> Delete(Product product);
     }
 }

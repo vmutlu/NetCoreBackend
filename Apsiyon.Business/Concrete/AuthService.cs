@@ -1,10 +1,11 @@
 ﻿using Apsiyon.Business.Abstract;
 using Apsiyon.Business.Constants;
-using Apsiyon.Core.Entities.Concrete;
-using Apsiyon.Core.Utilities.Results;
-using Apsiyon.Core.Utilities.Security.Hashing;
-using Apsiyon.Core.Utilities.Security.Jwt;
+using Apsiyon.Entities.Concrete;
 using Apsiyon.Entities.Dtos;
+using Apsiyon.Utilities.Results;
+using Apsiyon.Utilities.Security.Hashing;
+using Apsiyon.Utilities.Security.Jwt;
+using System.Threading.Tasks;
 
 namespace Apsiyon.Business.Concrete
 {
@@ -17,16 +18,16 @@ namespace Apsiyon.Business.Concrete
             _userService = userService;
             _tokenHelper = tokenHelper;
         }
-        public IDataResult<AccessToken> CreateAccessToken(User user)
+        public async Task<IDataResult<AccessToken>> CreateAccessToken(User user)
         {
-            var claims = _userService.GetClaims(user);
-            var accessToken = _tokenHelper.CreateToken(user, claims);
+            var claims = await _userService.GetClaims(user);
+            var accessToken =  _tokenHelper.CreateToken(user, claims);
             return new SuccessDataResult<AccessToken>(accessToken, Messages.AccessTokenCreated);
         }
 
-        public IDataResult<User> Login(UserForLoginDto userForLoginDto)
+        public async Task<IDataResult<User>> Login(UserForLoginDto userForLoginDto)
         {
-            var userToCheck = _userService.GetByEmail(userForLoginDto.Email);
+            var userToCheck = await _userService.GetByEmail(userForLoginDto.Email);
 
             if (userToCheck is null)
                 return new ErrorDataResult<User>(Messages.UserNotFound);
@@ -37,7 +38,7 @@ namespace Apsiyon.Business.Concrete
             return new SuccessDataResult<User>(userToCheck, Messages.SuccessFullLogin);
         }
 
-        public IDataResult<User> Register(UserForRegisterDto userForRegisterDto, string password)
+        public async Task<IDataResult<User>> Register(UserForRegisterDto userForRegisterDto, string password)
         {
             byte[] passwordHash, passwordSalt;
             HashingHelper.CreatePasswordHash(password, out passwordHash, out passwordSalt);
@@ -52,14 +53,14 @@ namespace Apsiyon.Business.Concrete
                 Status = true
             };
 
-            _userService.Add(user);
+            await _userService.Add(user);
 
             return new SuccessDataResult<User>(user, Messages.UserRegistered);
         }
 
-        public IResult UserExists(string email)
+        public async Task<IResult> UserExists(string email)
         {
-            if (_userService.GetByEmail(email) is not null)
+            if (await _userService.GetByEmail(email) is not null)
                 return new ErrorResult(Messages.UserAlreadyExists);
 
             return new SuccessResult();

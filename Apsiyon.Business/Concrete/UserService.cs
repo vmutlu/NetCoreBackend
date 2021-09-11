@@ -1,28 +1,26 @@
 ﻿using Apsiyon.Business.Abstract;
 using Apsiyon.DataAccess.Abstract;
-using Apsiyon.Core.Entities.Concrete;
+using Apsiyon.Entities.Concrete;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Apsiyon.Business.Concrete
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository) => (_userRepository) = (userRepository);
+        public async Task Add(User user)
         {
-            _userRepository = userRepository;
-        }
-        public void Add(User user)
-        {
-            _userRepository.Add(user);
+            await _userRepository.AddAsync(user);
         }
 
-        public User GetByEmail(string email)
+        public async Task<User> GetByEmail(string email)
         {
-            return _userRepository.Get(u => u.Email == email);
+            return await _userRepository.GetAsync(u => u.Email == email);
         }
 
-        public List<OperationClaim> GetClaims(User user)
+        public async Task<List<OperationClaim>> GetClaims(User user)
         {
             return _userRepository.GetClaims(user);
         }
