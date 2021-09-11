@@ -1,5 +1,5 @@
-﻿using Apsiyon.Core.DataAcccess;
-using Apsiyon.Core.Entities.Concrete;
+﻿using Apsiyon.DataAcccess;
+using Apsiyon.Entities.Concrete;
 using System.Collections.Generic;
 
 namespace Apsiyon.DataAccess.Abstract

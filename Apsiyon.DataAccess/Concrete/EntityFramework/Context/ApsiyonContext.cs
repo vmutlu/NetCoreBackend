@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Apsiyon.Core.Entities.Concrete;
-using System.IO;
+﻿using Apsiyon.DataAccess.Concrete.EntityFramework.Configurations;
 using Apsiyon.Entities.Concrete;
-using Apsiyon.DataAccess.Concrete.EntityFramework.Configurations;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace Apsiyon.DataAccess.Concrete.EntityFramework.Context
 {
