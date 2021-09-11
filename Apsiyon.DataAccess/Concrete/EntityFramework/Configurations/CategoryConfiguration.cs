@@ -4,13 +4,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Apsiyon.DataAccess.Concrete.EntityFramework.Configurations
 {
-    public class CategoryConfiguration : IEntityTypeConfiguration<Category>
+    public class CategoryConfiguration : BaseConfiguration<Category>
     {
-        public void Configure(EntityTypeBuilder<Category> modelBuilder)
+        public override void Configure(EntityTypeBuilder<Category> builder)
         {
-            modelBuilder.ToTable("Categories");
-            modelBuilder.Property<int>(x => x.Id).HasColumnName(@"Id").IsRequired(true).UseIdentityColumn().ValueGeneratedOnAdd();
-            modelBuilder.Property<string>(x => x.Name).HasColumnName(@"Name").IsRequired(true).ValueGeneratedNever();
+            builder.ToTable("Categories");
+            builder.Property<string>(x => x.Name).HasColumnName(@"Name").IsRequired(true).ValueGeneratedNever();
+
+            base.Configure(builder);
         }
     }
 }
