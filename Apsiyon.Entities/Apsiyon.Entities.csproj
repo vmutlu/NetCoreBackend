@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Apsiyon" Version="1.0.2" />
     <PackageReference Include="MicroKnights.Log4NetAdoNetAppender" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.5">
@@ -12,10 +13,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Apsiyon.Core\Apsiyon.Core.csproj" />
   </ItemGroup>
 
 </Project>

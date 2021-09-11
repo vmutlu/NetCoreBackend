@@ -1,4 +1,4 @@
-﻿using Apsiyon.Core.Entities.Abstract;
+﻿using Apsiyon.Entities.Abstract;
 
 namespace Apsiyon.Entities.Dtos
 {
