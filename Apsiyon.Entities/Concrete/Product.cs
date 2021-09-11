@@ -1,11 +1,10 @@
-﻿using Apsiyon.Core.Entities.Abstract;
+﻿using Apsiyon.Entities.Abstract;
 using System.Collections.Generic;
 
 namespace Apsiyon.Entities.Concrete
 {
-    public class Product: IEntity
+    public class Product: Entity
     {
-        public int Id { get; set; }
         public string ProductName { get; set; }
         public string QuantityPerUnit { get; set; }
         public decimal UnitPrice { get; set; }
