@@ -1,6 +1,7 @@
 ﻿using Apsiyon.Business.Abstract;
 using Apsiyon.Entities.Dtos;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Apsiyon.API.Controllers
 {
@@ -12,14 +13,14 @@ namespace Apsiyon.API.Controllers
         public AuthController(IAuthService authService) => _authService = authService;
 
         [HttpPost("login")]
-        public IActionResult Login(UserForLoginDto userForLoginDto)
+        public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
-            var userToLogin = _authService.Login(userForLoginDto);
+            var userToLogin = await _authService.Login(userForLoginDto);
 
             if (userToLogin.Success is false)
                 return BadRequest(userToLogin);
 
-            var result = _authService.CreateAccessToken(userToLogin.Data);
+            var result = await _authService.CreateAccessToken(userToLogin.Data);
 
             if (result.Success is false)
                 return BadRequest(result);
@@ -28,15 +29,15 @@ namespace Apsiyon.API.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(UserForRegisterDto userForRegisterDto)
+        public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
         {
-            var userExitst = _authService.UserExists(userForRegisterDto.Email);
+            var userExitst = await _authService.UserExists(userForRegisterDto.Email);
 
             if (userExitst.Success is false)
                 return BadRequest(userExitst);
 
-            var registerResult = _authService.Register(userForRegisterDto, userForRegisterDto.Password);
-            var result = _authService.CreateAccessToken(registerResult.Data);
+            var registerResult = await _authService.Register(userForRegisterDto, userForRegisterDto.Password);
+            var result = await _authService.CreateAccessToken(registerResult.Data);
 
             if (result.Success is false)
                 return BadRequest(result);

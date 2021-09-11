@@ -2,6 +2,7 @@
 using Apsiyon.Entities.Concrete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Apsiyon.API.Controllers
 {
@@ -11,12 +12,12 @@ namespace Apsiyon.API.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
-        public ProductsController(IProductService productService) => _productService = productService;
+        public ProductsController(IProductService productService) => (_productService) = (productService);
 
         [HttpGet("getAll")]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var response = _productService.GetList();
+            var response = await _productService.GetList();
 
             if (response.Success)
                 return Ok(response);
@@ -26,9 +27,9 @@ namespace Apsiyon.API.Controllers
 
 
         [HttpGet("getListByCategory/{categoryId}")]
-        public IActionResult GetListByCategory(int categoryId)
+        public async Task<IActionResult> GetListByCategory(int categoryId)
         {
-            var response = _productService.GetListProductCategory(categoryId);
+            var response = await _productService.GetListProductCategory(categoryId);
 
             if (response.Success)
                 return Ok(response);
@@ -37,9 +38,9 @@ namespace Apsiyon.API.Controllers
         }
 
         [HttpGet("getById")]
-        public IActionResult GetById([FromQuery] int id)
+        public async Task<IActionResult> GetById([FromQuery] int id)
         {
-            var response = _productService.GetById(id);
+            var response = await _productService.GetById(id);
 
             if (response.Success)
                 return Ok(response);
@@ -48,9 +49,9 @@ namespace Apsiyon.API.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult Post([FromBody] Product product)
+        public async Task<IActionResult> Post([FromBody] Product product)
         {
-            var response = _productService.Add(product);
+            var response = await _productService.Add(product);
 
             if (response.Success)
                 return Ok(response);
@@ -59,9 +60,9 @@ namespace Apsiyon.API.Controllers
         }
 
         [HttpDelete("delete/{id}")]
-        public IActionResult Delete([FromBody] Product product)
+        public async Task<IActionResult> Delete([FromBody] Product product)
         {
-            var response = _productService.Delete(product);
+            var response = await _productService.Delete(product);
 
             if (response.Success)
                 return Ok(response);
@@ -70,9 +71,9 @@ namespace Apsiyon.API.Controllers
         }
 
         [HttpPut("update")]
-        public IActionResult Update([FromBody] Product product)
+        public async Task<IActionResult> Update([FromBody] Product product)
         {
-            var response = _productService.Update(product);
+            var response = await _productService.Update(product);
 
             if (response.Success)
                 return Ok(response);

@@ -1,8 +1,8 @@
-using Apsiyon.Core.DependencyResolvers;
-using Apsiyon.Core.Extensions;
-using Apsiyon.Core.Utilities.IoC;
-using Apsiyon.Core.Utilities.Security.Encryption;
-using Apsiyon.Core.Utilities.Security.Jwt;
+using Apsiyon.DependencyResolvers;
+using Apsiyon.Extensions;
+using Apsiyon.Utilities.IoC;
+using Apsiyon.Utilities.Security.Encryption;
+using Apsiyon.Utilities.Security.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
