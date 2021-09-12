@@ -1,15 +1,21 @@
 ﻿using Apsiyon.Aspects.Autofac.Caching;
 using Apsiyon.Aspects.Autofac.Logging;
-using Apsiyon.Aspects.Autofac.Performans;
 using Apsiyon.Aspects.Autofac.Transaction;
+using Apsiyon.Aspects.Autofac.UsersAspect;
+using Apsiyon.Aspects.Autofac.Validation;
 using Apsiyon.Business.Abstract;
 using Apsiyon.Business.Constants;
+using Apsiyon.Business.ValidationRules.FluentValidation;
 using Apsiyon.CrossCuttingConcerns.Logging.Log4Net.Loggers;
 using Apsiyon.DataAccess.Abstract;
 using Apsiyon.Entities.Concrete;
+using Apsiyon.Extensions;
+using Apsiyon.Services.Abstract;
+using Apsiyon.Utilities.Business;
 using Apsiyon.Utilities.Results;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Apsiyon.Business.Concrete
@@ -17,43 +23,52 @@ namespace Apsiyon.Business.Concrete
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
-        private readonly ICategoryService _categoryService;
-        public ProductService(IProductRepository productRepository, ICategoryService categoryService)
+        private readonly IPaginationUriService _uriService;
+        public ProductService(IProductRepository productRepository, IPaginationUriService uriService)
         {
             _productRepository = productRepository;
-            _categoryService = categoryService;
+            _uriService = uriService;
         }
 
-        private async Task<IResult> CheckIfProductNameExists(string productName)
+        private IResult CheckIfProductNameExists(string productName)
         {
-            if (await _productRepository.GetAsync(p => p.ProductName == productName) != null)
+            if (_productRepository.GetAsync(p => p.ProductName == productName).Result != null)
                 return new ErrorResult(Messages.ErrorProductAdded);
 
             return new SuccessResult("Ürün eklensin");
         }
 
-        //[SecuredOperation("admin,user")]
-        //[ValidationAspect(typeof(ProductValidator))]
-        [TransactionScopeAspect]
+        [SecuredOperation("admin,user")]
+        [ValidationAspect(typeof(ProductValidator))]
         [CacheRemoveAspect("IProductService.Get")]
-        public async Task<IResult> Add(Product product)
+        [TransactionScopeAspect]
+        public async Task<IResult> AddAsync(Product product)
         {
-            //IResult result = BusinessRules.Run(CheckIfProductNameExists(product.ProductName));
-            //if (result == null)
-            //    return result;
+            IResult result = BusinessRules.Run(CheckIfProductNameExists(product.ProductName));
 
-          await  _productRepository.AddAsync(product);
+            if (result == null)
+                return result;
+
+            await  _productRepository.AddAsync(product);
             return new SuccessResult(Messages.ProductAdded);
         }
 
-        public async Task<IResult> Delete(Product product)
+        [SecuredOperation("admin")]
+        [CacheRemoveAspect("IProductService.GetAllAsync")]
+        [TransactionScopeAspect]
+        public async Task<IResult> DeleteAsync(int id)
         {
-           await _productRepository.DeleteAsync(product);
+            var result = await _productRepository.GetAsync(i => i.Id == id);
+
+            if (result is null)
+                return new ErrorResult($"{id} id'sine sahip ürün bulunamadı");
+
+            await _productRepository.DeleteAsync(result);
             return new SuccessResult(Messages.ProductDeleted);
         }
 
         [LogAspect(typeof(DatabaseLogger))]
-        public async Task<IDataResult<Product>> GetById(int productId)
+        public async Task<IDataResult<Product>> GetByIdAsync(int productId)
         {
             var product = await _productRepository.GetAsync(p => p.Id == productId, t => t.CategoryWithProducts);
             if (product is null)
@@ -80,11 +95,12 @@ namespace Apsiyon.Business.Concrete
             return new SuccessDataResult<Product>(response);
         }
 
-        [PerformanceAspect(5)]
-        [CacheAspect(1)]
-        public async Task<IDataResult<List<Product>>> GetList()
+
+        [SecuredOperation("admin")]
+        [CacheAspect]
+        public async Task<IDataResult<PaginationDataResult<Product>>> GetAllAsync(PaginationQuery paginationQuery = null)
         {
-            var response = (from p in await _productRepository.GetAllAsync(null, null, p => p.CategoryWithProducts)
+            var response = (from p in await _productRepository.GetAllAsync(null, null, p => p.CategoryWithProducts).ConfigureAwait(false)
                             select new Product()
                             {
                                 Id = p.Id,
@@ -92,7 +108,7 @@ namespace Apsiyon.Business.Concrete
                                 QuantityPerUnit = p.QuantityPerUnit,
                                 UnitPrice = p.UnitPrice,
                                 UnitsInStock = p.UnitsInStock,
-                                CategoryWithProducts = p.CategoryWithProducts != null ? from pc in p.CategoryWithProducts
+                                CategoryWithProducts = p.CategoryWithProducts != null ? (from pc in p.CategoryWithProducts
                                                                                         select new CategoryWithProduct
                                                                                         {
                                                                                             CategoryId = pc.CategoryId,
@@ -101,18 +117,24 @@ namespace Apsiyon.Business.Concrete
                                                                                             {
                                                                                                 Id = pc.CategoryId
                                                                                             }
-                                                                                        } : null
-                            });
-            return new SuccessDataResult<List<Product>>(response.ToList());
+                                                                                        }).ToList() : null
+                            }).ToList();
+
+            var responsePagination = response.AsQueryable().CreatePaginationResult(HttpStatusCode.OK, paginationQuery, response.Count, _uriService);
+            return new SuccessDataResult<PaginationDataResult<Product>>(responsePagination, (HttpStatusCode)responsePagination.StatusCode);
         }
 
+        [SecuredOperation("admin")]
         public async Task<IDataResult<List<Product>>> GetListProductCategory(int categoryId)
         {
             var response = await _productRepository.GetAllAsync(p => p.Id == categoryId, null);
-            return new SuccessDataResult<List<Product>>(response.ToList());
+            return new SuccessDataResult<List<Product>>(response);
         }
 
-        public async Task<IResult> Update(Product product)
+        [SecuredOperation("admin")]
+        [CacheRemoveAspect("IProductService.GetAllAsync")]
+        [TransactionScopeAspect]
+        public async Task<IResult> UpdateAsync(Product product)
         {
             await _productRepository.UpdateAsync(product);
             return new SuccessResult(Messages.ProductUpdated);
