@@ -8,6 +8,16 @@ namespace Apsiyon.DataAccess.Concrete.EntityFramework.Context
 {
     public class ApsiyonContext : DbContext
     {
+        public ApsiyonContext(DbContextOptions<ApsiyonContext> options) : base(options)
+        {
+
+        }
+
+        public ApsiyonContext()
+        {
+
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var Configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build();

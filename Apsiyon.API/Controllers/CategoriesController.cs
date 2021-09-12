@@ -1,5 +1,7 @@
 ﻿using Apsiyon.Business.Abstract;
 using Apsiyon.Entities.Concrete;
+using Apsiyon.Services.Abstract;
+using Apsiyon.Utilities.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -12,12 +14,13 @@ namespace Apsiyon.API.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
-        public CategoriesController(ICategoryService categoryService) => (_categoryService) = (categoryService);
+        private readonly IPaginationUriService _paginationUriService;
+        public CategoriesController(ICategoryService categoryService, IPaginationUriService paginationUriService) => (_categoryService, _paginationUriService) = (categoryService, paginationUriService);
 
         [HttpGet("getAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromBody] PaginationQuery paginationQuery)
         {
-            var response = await _categoryService.GetList();
+            var response = await _categoryService.GetAllAsync(paginationQuery).ConfigureAwait(false);
 
             if (response.Success)
                 return Ok(response);
@@ -28,7 +31,7 @@ namespace Apsiyon.API.Controllers
         [HttpGet("getById/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var response = await _categoryService.GetById(id);
+            var response = await _categoryService.GetByIdAsync(id);
 
             if (response.Success)
                 return Ok(response);
@@ -39,7 +42,7 @@ namespace Apsiyon.API.Controllers
         [HttpPost("add")]
         public async Task<IActionResult> Post([FromBody] Category category)
         {
-            var response = await _categoryService.Add(category);
+            var response = await _categoryService.AddAsync(category);
 
             if (response.Success)
                 return Ok(response);
@@ -48,9 +51,9 @@ namespace Apsiyon.API.Controllers
         }
 
         [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> Delete([FromBody] Category category)
+        public async Task<IActionResult> Delete(int id)
         {
-            var response = await _categoryService.Delete(category);
+            var response = await _categoryService.DeleteAsync(id);
 
             if (response.Success)
                 return Ok(response);
@@ -61,7 +64,7 @@ namespace Apsiyon.API.Controllers
         [HttpPut("update")]
         public async Task<IActionResult> Update([FromBody] Category category)
         {
-            var response = await _categoryService.Update(category);
+            var response = await _categoryService.UpdateAsync(category);
 
             if (response.Success)
                 return Ok(response);

@@ -1,11 +1,19 @@
+using Apsiyon.API.Extensions;
+using Apsiyon.CrossCuttingConcerns.Caching;
+using Apsiyon.CrossCuttingConcerns.Caching.Microsoft;
+using Apsiyon.DataAccess.Concrete.EntityFramework.Context;
 using Apsiyon.DependencyResolvers;
 using Apsiyon.Extensions;
+using Apsiyon.Services.Abstract;
+using Apsiyon.Services.Concrete;
 using Apsiyon.Utilities.IoC;
 using Apsiyon.Utilities.Security.Encryption;
 using Apsiyon.Utilities.Security.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,34 +27,14 @@ namespace Apsiyon.API
         public Startup(IConfiguration configuration) => Configuration = configuration;
 
         public IConfiguration Configuration { get; }
+        private const string CorsPolicy = "AllowOrigin";
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowOrigin", builder => builder.WithOrigins("http://localhost:4200"));
-            });
+            services.ConfigureDatabase(Configuration);
 
             var tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateAudience = true,
-                    ValidateIssuer = true,
-                    ValidateLifetime = true,
-                    ValidIssuer = tokenOptions.Issuer,
-                    ValidAudience = tokenOptions.Audience,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
-                };
-            });
-
-            services.AddDependencyResolvers(new ICoreModule[]{
-                 new CoreModule()
-            });
+            services.ConfigureDependecies(tokenOptions);
 
             services.AddSwaggerGen(c =>
             {
@@ -65,11 +53,11 @@ namespace Apsiyon.API
 
             app.ConfigureCustomExceptionMiddleware();
 
-            app.UseCors(builder => builder.WithOrigins("http://localhost:4200").AllowAnyHeader());
-
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(CorsPolicy);
 
             app.UseAuthentication();
 
