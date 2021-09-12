@@ -12,6 +12,9 @@ namespace Apsiyon.DataAccess.Concrete.EntityFramework.Configurations
             modelBuilder.Property<int>(x => x.UserId).HasColumnName(@"UserId").IsRequired(true).ValueGeneratedNever();
             modelBuilder.Property<int>(x => x.OperationClaimId).HasColumnName(@"OperationClaimId").IsRequired(true).ValueGeneratedNever();
 
+            modelBuilder.HasOne(x => x.User).WithMany(op => op.UserOperationClaims).IsRequired(true).HasForeignKey(x => x.UserId);
+            modelBuilder.HasOne(x => x.OperationClaim).WithMany(op => op.UserOperationClaims).IsRequired(true).HasForeignKey(x => x.OperationClaimId);
+
             base.Configure(modelBuilder);
         }
     }
