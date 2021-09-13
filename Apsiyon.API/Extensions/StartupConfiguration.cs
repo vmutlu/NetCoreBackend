@@ -1,5 +1,4 @@
-﻿using Apsiyon.DataAcccess;
-using Apsiyon.DataAccess.Concrete.EntityFramework.Context;
+﻿using Apsiyon.DataAccess.Concrete.EntityFramework.Context;
 using Apsiyon.DependencyResolvers;
 using Apsiyon.Extensions;
 using Apsiyon.Services.Abstract;
