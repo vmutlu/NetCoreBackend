@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  apsiyon.api:
+    image: ${DOCKER_REGISTRY-}apsiyonapi
+    build:
+      context: .
+      dockerfile: Apsiyon.API/Dockerfile

@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Apsiyon.Business", "Apsiyon
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Apsiyon.API", "Apsiyon.API\Apsiyon.API.csproj", "{2C5159C6-D14A-48F4-880D-80AC9A227975}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{1E580663-E1F2-42F5-B96D-6CEB16FDB016}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{2C5159C6-D14A-48F4-880D-80AC9A227975}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C5159C6-D14A-48F4-880D-80AC9A227975}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C5159C6-D14A-48F4-880D-80AC9A227975}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E580663-E1F2-42F5-B96D-6CEB16FDB016}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E580663-E1F2-42F5-B96D-6CEB16FDB016}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E580663-E1F2-42F5-B96D-6CEB16FDB016}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E580663-E1F2-42F5-B96D-6CEB16FDB016}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
