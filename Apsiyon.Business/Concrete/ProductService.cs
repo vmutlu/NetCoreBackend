@@ -93,6 +93,9 @@ namespace Apsiyon.Business.Concrete
         [CacheAspect]
         public async Task<PagingResult<Product>> GetAllAsync(GeneralFilter generalFilter = null)
         {
+            if (generalFilter.Page <= 0 || generalFilter.PropertyName == null)
+                return new PagingResult<Product>(null, 0, false, Messages.EmptyObject);
+
             var query = await _productRepository.GetAllForPagingAsync(generalFilter.Page, generalFilter.PropertyName, generalFilter.Asc, null, c => c.CategoryWithProducts).ConfigureAwait(false);
             var response = (from p in query.Data
                             select new Product()

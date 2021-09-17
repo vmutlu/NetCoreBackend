@@ -1,5 +1,6 @@
 ﻿using Apsiyon.Aspects.Autofac.UsersAspect;
 using Apsiyon.Business.Abstract;
+using Apsiyon.Business.Constants;
 using Apsiyon.DataAccess.Abstract;
 using Apsiyon.Entities;
 using Apsiyon.Entities.Concrete;
@@ -35,6 +36,9 @@ namespace Apsiyon.Business.Concrete
         [SecuredOperation("admin")]
         public async Task<PagingResult<UserOperationClaim>> GetAllAsync(GeneralFilter generalFilter = null)
         {
+            if (generalFilter.Page <= 0 || generalFilter.PropertyName == null)
+                return new PagingResult<UserOperationClaim>(null, 0, false, Messages.EmptyObject);
+
             var query = await _userOperationClaimRepository.GetAllForPagingAsync(generalFilter.Page, generalFilter.PropertyName, generalFilter.Asc, null, c => c.User, o => o.OperationClaim).ConfigureAwait(false);
             var response = (from uoc in query.Data
                             select new UserOperationClaim()
