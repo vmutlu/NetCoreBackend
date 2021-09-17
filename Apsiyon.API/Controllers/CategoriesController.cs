@@ -1,7 +1,6 @@
 ﻿using Apsiyon.Business.Abstract;
+using Apsiyon.Entities;
 using Apsiyon.Entities.Concrete;
-using Apsiyon.Services.Abstract;
-using Apsiyon.Utilities.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -14,13 +13,12 @@ namespace Apsiyon.API.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
-        private readonly IPaginationUriService _paginationUriService;
-        public CategoriesController(ICategoryService categoryService, IPaginationUriService paginationUriService) => (_categoryService, _paginationUriService) = (categoryService, paginationUriService);
+        public CategoriesController(ICategoryService categoryService) => (_categoryService) = (categoryService);
 
         [HttpGet("getAll")]
-        public async Task<IActionResult> GetAll([FromBody] PaginationQuery paginationQuery)
+        public async Task<IActionResult> GetAll(GeneralFilter generalFilter)
         {
-            var response = await _categoryService.GetAllAsync(paginationQuery).ConfigureAwait(false);
+            var response = await _categoryService.GetAllAsync(generalFilter).ConfigureAwait(false);
 
             if (response.Success)
                 return Ok(response);

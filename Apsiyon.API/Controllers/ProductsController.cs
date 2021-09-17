@@ -1,6 +1,6 @@
 ﻿using Apsiyon.Business.Abstract;
+using Apsiyon.Entities;
 using Apsiyon.Entities.Concrete;
-using Apsiyon.Utilities.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -16,9 +16,9 @@ namespace Apsiyon.API.Controllers
         public ProductsController(IProductService productService) => (_productService) = (productService);
 
         [HttpGet("getAll")]
-        public async Task<IActionResult> GetAll([FromBody, FromQuery] PaginationQuery paginationQuery)
+        public async Task<IActionResult> GetAll(GeneralFilter generalFilter)
         {
-            var response = await _productService.GetAllAsync(paginationQuery).ConfigureAwait(false);
+            var response = await _productService.GetAllAsync(generalFilter).ConfigureAwait(false);
 
             if (response.Success)
                 return Ok(response);
