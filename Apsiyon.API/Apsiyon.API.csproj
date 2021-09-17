@@ -18,7 +18,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Apsiyon" Version="1.0.9" />
+		<PackageReference Include="Apsiyon" Version="2.0.2" />
 		<PackageReference Include="MicroKnights.Log4NetAdoNetAppender" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />

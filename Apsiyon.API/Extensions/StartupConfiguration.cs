@@ -1,8 +1,6 @@
 ﻿using Apsiyon.DataAccess.Concrete.EntityFramework.Context;
 using Apsiyon.DependencyResolvers;
 using Apsiyon.Extensions;
-using Apsiyon.Services.Abstract;
-using Apsiyon.Services.Concrete;
 using Apsiyon.Utilities.IoC;
 using Apsiyon.Utilities.Security.Encryption;
 using Apsiyon.Utilities.Security.Jwt;
@@ -25,12 +23,6 @@ namespace Apsiyon.API.Extensions
         public static void ConfigureDependecies(this IServiceCollection services, TokenOptions tokenOption)
         {
             services.AddHttpContextAccessor();
-
-            services.AddTransient<IPaginationUriService>(opt =>
-            {
-                var httpContextAccessor = opt.GetRequiredService<IHttpContextAccessor>();
-                return new PaginationUriService(httpContextAccessor);
-            });
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 

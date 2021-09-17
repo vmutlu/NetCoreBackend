@@ -1,23 +1,11 @@
 using Apsiyon.API.Extensions;
-using Apsiyon.CrossCuttingConcerns.Caching;
-using Apsiyon.CrossCuttingConcerns.Caching.Microsoft;
-using Apsiyon.DataAccess.Concrete.EntityFramework.Context;
-using Apsiyon.DependencyResolvers;
 using Apsiyon.Extensions;
-using Apsiyon.Services.Abstract;
-using Apsiyon.Services.Concrete;
-using Apsiyon.Utilities.IoC;
-using Apsiyon.Utilities.Security.Encryption;
 using Apsiyon.Utilities.Security.Jwt;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 namespace Apsiyon.API
