@@ -1,12 +1,10 @@
 ﻿using Apsiyon.Aspects.Autofac.UsersAspect;
 using Apsiyon.Business.Abstract;
 using Apsiyon.DataAccess.Abstract;
+using Apsiyon.Entities;
 using Apsiyon.Entities.Concrete;
-using Apsiyon.Extensions;
-using Apsiyon.Services.Abstract;
 using Apsiyon.Utilities.Results;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Apsiyon.Business.Concrete
@@ -14,9 +12,8 @@ namespace Apsiyon.Business.Concrete
     public class UserOperationClaimService : IUserOperationClaimService
     {
         private readonly IUserOperationClaimRepository _userOperationClaimRepository;
-        private readonly IPaginationUriService _uriService;
 
-        public UserOperationClaimService(IUserOperationClaimRepository userOperationClaimRepository, IPaginationUriService uriService) { _userOperationClaimRepository = userOperationClaimRepository;  _uriService = uriService; }
+        public UserOperationClaimService(IUserOperationClaimRepository userOperationClaimRepository) => (_userOperationClaimRepository) = (userOperationClaimRepository);
 
         public async Task<IResult> AddAsync(UserOperationClaim operation)
         {
@@ -36,9 +33,10 @@ namespace Apsiyon.Business.Concrete
         }
 
         [SecuredOperation("admin")]
-        public async Task<IDataResult<PaginationDataResult<UserOperationClaim>>> GetAllAsync(PaginationQuery paginationQuery = null)
+        public async Task<PagingResult<UserOperationClaim>> GetAllAsync(GeneralFilter generalFilter = null)
         {
-            var response = (from uoc in await _userOperationClaimRepository.GetAllAsync(null, paginationQuery, o => o.User, o => o.OperationClaim).ConfigureAwait(false)
+            var query = await _userOperationClaimRepository.GetAllForPagingAsync(generalFilter.Page, generalFilter.PropertyName, generalFilter.Asc, null, c => c.User, o => o.OperationClaim).ConfigureAwait(false);
+            var response = (from uoc in query.Data
                             select new UserOperationClaim()
                             {
                                 Id = uoc.Id,
@@ -57,8 +55,7 @@ namespace Apsiyon.Business.Concrete
                                 } : null
                             }).ToList();
 
-            var responsePagination = response.AsQueryable().CreatePaginationResult(HttpStatusCode.OK, paginationQuery, response.Count, _uriService);
-            return new SuccessDataResult<PaginationDataResult<UserOperationClaim>>(responsePagination);
+            return new PagingResult<UserOperationClaim>(response, query.TotalItemCount, query.Success, query.Message);
         }
 
         [SecuredOperation("admin")]

@@ -1,14 +1,12 @@
 ﻿using Apsiyon.Aspects.Autofac.UsersAspect;
 using Apsiyon.Business.Abstract;
 using Apsiyon.DataAccess.Abstract;
+using Apsiyon.Entities;
 using Apsiyon.Entities.Concrete;
-using Apsiyon.Extensions;
 using Apsiyon.Extensions.MapHelper;
-using Apsiyon.Services.Abstract;
 using Apsiyon.Utilities.Results;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Apsiyon.Business.Concrete
@@ -17,13 +15,11 @@ namespace Apsiyon.Business.Concrete
     {
         private readonly IOperationClaimRepository _operationClaimRepository;
         private readonly IUserService _userService;
-        private readonly IPaginationUriService _uriService;
 
-        public OperationClaimService(IOperationClaimRepository operationClaimRepository, IUserService userService, IPaginationUriService uriService)
+        public OperationClaimService(IOperationClaimRepository operationClaimRepository, IUserService userService)
         {
             _operationClaimRepository = operationClaimRepository;
             _userService = userService;
-            _uriService = uriService;
         }
 
         [SecuredOperation("admin,user")]
@@ -42,10 +38,11 @@ namespace Apsiyon.Business.Concrete
         }
 
         [SecuredOperation("admin,user")]
-        public async Task<IDataResult<PaginationDataResult<OperationClaim>>> GetAllAsync(PaginationQuery paginationQuery=null)
+        public async Task<PagingResult<OperationClaim>> GetAllAsync(GeneralFilter generalFilter = null)
         {
+            var query = await _operationClaimRepository.GetAllForPagingAsync(generalFilter.Page, generalFilter.PropertyName, generalFilter.Asc, null, c => c.UserOperationClaims).ConfigureAwait(false);
             var users = await _userService.GetUsersAsync().ConfigureAwait(false);
-            var response = (from oc in await _operationClaimRepository.GetAllAsync(null, paginationQuery, o => o.UserOperationClaims).ConfigureAwait(false)
+            var response = (from oc in query.Data
                             from u in oc.UserOperationClaims
                             from us in users
                             where u.UserId == us.Id
@@ -68,9 +65,7 @@ namespace Apsiyon.Business.Concrete
                             }).ToList();
 
 
-            var responsePagination = response.AsQueryable().CreatePaginationResult(HttpStatusCode.OK, paginationQuery, response.Count, _uriService);
-
-            return new SuccessDataResult<PaginationDataResult<OperationClaim>>(responsePagination);
+            return new PagingResult<OperationClaim>(response, query.TotalItemCount, query.Success, query.Message);
         }
 
         [SecuredOperation("admin,user")]

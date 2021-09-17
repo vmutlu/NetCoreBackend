@@ -4,12 +4,10 @@ using Apsiyon.Aspects.Autofac.UsersAspect;
 using Apsiyon.Business.Abstract;
 using Apsiyon.Business.Constants;
 using Apsiyon.DataAccess.Abstract;
+using Apsiyon.Entities;
 using Apsiyon.Entities.Concrete;
-using Apsiyon.Extensions;
-using Apsiyon.Services.Abstract;
 using Apsiyon.Utilities.Results;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Apsiyon.Business.Concrete
@@ -17,12 +15,7 @@ namespace Apsiyon.Business.Concrete
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IPaginationUriService _uriService;
-        public CategoryService(ICategoryRepository categoryRepository, IPaginationUriService uriService)
-        {
-            _categoryRepository = categoryRepository;
-            _uriService = uriService;
-        }
+        public CategoryService(ICategoryRepository categoryRepository) => (_categoryRepository) = (categoryRepository);
 
         [SecuredOperation("admin")]
         [CacheRemoveAspect("ICategoryService.GetAllAsync")]
@@ -75,9 +68,10 @@ namespace Apsiyon.Business.Concrete
 
         [SecuredOperation("admin,user")]
         [CacheAspect]
-        public async Task<IDataResult<PaginationDataResult<Category>>> GetAllAsync(PaginationQuery paginationQuery = null)
+        public async Task<PagingResult<Category>> GetAllAsync(GeneralFilter generalFilter = null)
         {
-            var response = (from c in await _categoryRepository.GetAllAsync(null, null, c => c.CategoryWithProducts).ConfigureAwait(false)
+            var query = await _categoryRepository.GetAllForPagingAsync(generalFilter.Page, generalFilter.PropertyName, generalFilter.Asc, null, c => c.CategoryWithProducts).ConfigureAwait(false);
+            var response = (from c in query.Data
                             select new Category()
                             {
                                 Id = c.Id,
@@ -94,8 +88,7 @@ namespace Apsiyon.Business.Concrete
                                                                                          }).ToList() : null
                             }).ToList();
 
-            var responsePagination = response.AsQueryable().CreatePaginationResult(HttpStatusCode.OK, paginationQuery, response.Count, _uriService);
-            return new SuccessDataResult<PaginationDataResult<Category>>(responsePagination, (HttpStatusCode)responsePagination.StatusCode);
+            return new PagingResult<Category>(response, query.TotalItemCount, query.Success, query.Message);
         }
 
         [SecuredOperation("admin")]

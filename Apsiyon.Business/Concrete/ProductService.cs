@@ -8,14 +8,12 @@ using Apsiyon.Business.Constants;
 using Apsiyon.Business.ValidationRules.FluentValidation;
 using Apsiyon.CrossCuttingConcerns.Logging.Log4Net.Loggers;
 using Apsiyon.DataAccess.Abstract;
+using Apsiyon.Entities;
 using Apsiyon.Entities.Concrete;
-using Apsiyon.Extensions;
-using Apsiyon.Services.Abstract;
 using Apsiyon.Utilities.Business;
 using Apsiyon.Utilities.Results;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Apsiyon.Business.Concrete
@@ -23,12 +21,7 @@ namespace Apsiyon.Business.Concrete
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
-        private readonly IPaginationUriService _uriService;
-        public ProductService(IProductRepository productRepository, IPaginationUriService uriService)
-        {
-            _productRepository = productRepository;
-            _uriService = uriService;
-        }
+        public ProductService(IProductRepository productRepository) => (_productRepository) = (productRepository);
 
         private IResult CheckIfProductNameExists(string productName)
         {
@@ -98,9 +91,10 @@ namespace Apsiyon.Business.Concrete
 
         [SecuredOperation("admin")]
         [CacheAspect]
-        public async Task<IDataResult<PaginationDataResult<Product>>> GetAllAsync(PaginationQuery paginationQuery = null)
+        public async Task<PagingResult<Product>> GetAllAsync(GeneralFilter generalFilter = null)
         {
-            var response = (from p in await _productRepository.GetAllAsync(null, null, p => p.CategoryWithProducts).ConfigureAwait(false)
+            var query = await _productRepository.GetAllForPagingAsync(generalFilter.Page, generalFilter.PropertyName, generalFilter.Asc, null, c => c.CategoryWithProducts).ConfigureAwait(false);
+            var response = (from p in query.Data
                             select new Product()
                             {
                                 Id = p.Id,
@@ -120,8 +114,7 @@ namespace Apsiyon.Business.Concrete
                                                                                         }).ToList() : null
                             }).ToList();
 
-            var responsePagination = response.AsQueryable().CreatePaginationResult(HttpStatusCode.OK, paginationQuery, response.Count, _uriService);
-            return new SuccessDataResult<PaginationDataResult<Product>>(responsePagination, (HttpStatusCode)responsePagination.StatusCode);
+            return new PagingResult<Product>(response, query.TotalItemCount, query.Success, query.Message);
         }
 
         [SecuredOperation("admin")]
