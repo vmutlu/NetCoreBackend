@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace Apsiyon.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
     [Authorize]
     public class CategoriesController : ControllerBase
     {
@@ -18,7 +19,7 @@ namespace Apsiyon.API.Controllers
         [HttpGet("getAll")]
         public async Task<IActionResult> GetAll(GeneralFilter generalFilter)
         {
-              var response = await _categoryService.GetAllAsync(generalFilter).ConfigureAwait(false);
+            var response = await _categoryService.GetAllAsync(generalFilter).ConfigureAwait(false);
 
             if (response.Success)
                 return Ok(response);

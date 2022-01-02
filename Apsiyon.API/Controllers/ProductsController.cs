@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace Apsiyon.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
     [Authorize]
     public class ProductsController : ControllerBase
     {

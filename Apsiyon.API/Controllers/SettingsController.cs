@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace ToDo.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
     public class SettingsController : ControllerBase
     {
         private readonly IOperationClaimService _operationClaimService;
