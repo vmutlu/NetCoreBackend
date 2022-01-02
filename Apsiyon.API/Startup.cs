@@ -21,6 +21,8 @@ namespace Apsiyon.API
         {
             services.ConfigureDatabase(Configuration);
 
+            services.ConfigureApiVersioning();
+
             var tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
             services.ConfigureDependecies(tokenOptions);
 

@@ -6,6 +6,7 @@ using Apsiyon.Utilities.Security.Encryption;
 using Apsiyon.Utilities.Security.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,6 +44,17 @@ namespace Apsiyon.API.Extensions
                     };
                 });
             services.AddDependencyResolvers(new ICoreModule[] { new CoreModule() });
+        }
+
+        public static void ConfigureApiVersioning(this IServiceCollection services)
+        {
+            services.AddApiVersioning(option =>
+            {
+                option.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+                option.AssumeDefaultVersionWhenUnspecified = true;
+                option.ReportApiVersions = true;
+                option.ApiVersionReader = ApiVersionReader.Combine(new UrlSegmentApiVersionReader(), new HeaderApiVersionReader("x-api-version"), new MediaTypeApiVersionReader("x-api-version"));
+            });
         }
     }
 }
