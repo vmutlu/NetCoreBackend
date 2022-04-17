@@ -19,6 +19,8 @@ namespace Apsiyon.API
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddRateLimitService(Configuration);
+                
             services.ConfigureDatabase(Configuration);
 
             services.ConfigureApiVersioning();

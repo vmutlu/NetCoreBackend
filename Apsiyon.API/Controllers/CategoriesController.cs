@@ -1,4 +1,6 @@
-﻿using Apsiyon.Business.Abstract;
+﻿using Apsiyon.ActionFilters;
+using Apsiyon.ActionFilters.Abstract;
+using Apsiyon.Business.Abstract;
 using Apsiyon.Entities;
 using Apsiyon.Entities.Concrete;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +19,7 @@ namespace Apsiyon.API.Controllers
         public CategoriesController(ICategoryService categoryService) => (_categoryService) = (categoryService);
 
         [HttpGet("getAll")]
+        [RateLimit(PeriodInSec = 60, Limit = 3)]
         public async Task<IActionResult> GetAll(GeneralFilter generalFilter)
         {
             var response = await _categoryService.GetAllAsync(generalFilter).ConfigureAwait(false);
@@ -28,6 +31,7 @@ namespace Apsiyon.API.Controllers
         }
 
         [HttpGet("getById/{id}")]
+        [RateLimit(PeriodInSec = 60, Limit = 3, RouteParams = "id")]
         public async Task<IActionResult> GetById(int id)
         {
             var response = await _categoryService.GetByIdAsync(id);
@@ -39,6 +43,7 @@ namespace Apsiyon.API.Controllers
         }
 
         [HttpPost("add")]
+        [IgnoreRateLimit]
         public async Task<IActionResult> Post([FromBody] Category category)
         {
             var response = await _categoryService.AddAsync(category);

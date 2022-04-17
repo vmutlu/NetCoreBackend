@@ -1,6 +1,8 @@
-﻿using Apsiyon.Business.Abstract;
+﻿using Apsiyon.ActionFilters;
+using Apsiyon.Business.Abstract;
 using Apsiyon.Entities;
 using Apsiyon.Entities.Concrete;
+using Apsiyon.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -11,6 +13,7 @@ namespace Apsiyon.API.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [Authorize]
+    [RateLimit(Limit = 3, PeriodInSec = 60, Scope = RateLimitScope.Controller)]
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
